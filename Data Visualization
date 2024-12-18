@@ -1,0 +1,236 @@
+**Activity 1: Image Transformations (Milestone 1)**
+
+Task 1: Image Translation
+# importing the required libraries
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+Load the original image "flower.jpg" using OpenCV.
+# Reading an Image
+img = cv2.imread("/content/flower.jpg")
+
+
+Displaying an Image
+plt.imshow(img)
+Conversion of BGR color format to RGB
+# Convert BGR to RGB color space
+imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+# show image
+plt.imshow(imgRGB)
+Perform image translation with a shift of 1/8th of the image height and width.  
+Display the translated image.
+height , width = imgRGB.shape[:2]
+Tx , Ty = height/8 , width/8
+
+# Translation matrix is of the form -
+#          |1 0 Tx|
+#      T = |0 1 Ty|
+
+T = np.float32([[1,0,Tx],[0,1,Ty]])
+img_trans =  cv2.warpAffine(imgRGB, T , (width,height))
+plt.imshow(img_trans)
+Task 2: Image Rotation
+
+ Load the original image "flower.jpg" using OpenCV.
+# importing the required libraries
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+Convert the BGR image to RGB format
+# Convert BGR to RGB color space
+imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+# show image
+plt.imshow(imgRGB)
+Rotate the image by 90 degrees clockwise.
+
+Display the rotated image.
+
+height , width = imgRGB.shape[:2]
+rotation_matrix = cv2.getRotationMatrix2D((width/2,height/2), 90, 1)
+img_rotated =  cv2.warpAffine(imgRGB, rotation_matrix , (width,height))
+plt.imshow(img_rotated)
+Task 3: Image Scaling
+Load the original image "flower.jpg" using OpenCV.
+
+
+Display the downsized image.
+
+Upsize the image to 150% of the original size using interpolation.
+
+Display the upsized image.
+
+# importing the required libraries
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+Convert the BGR image to RGB format.
+# Convert BGR to RGB color space
+imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+# show image
+plt.imshow(imgRGB)
+Downsize the image to 50% of the original size using interpolation.
+# cv2.resize(image, output_image_size, x_scale, y_scale, interpolation)
+#Downsize imgRGB using interpolation=cv2.INTER_AREA
+
+scaled_img = cv2.resize(imgRGB, None, fx=0.5, fy=0.5, interpolation=cv2.INTER_AREA)
+plt.imshow(scaled_img)
+#Upsize imgRGB using interpolation=cv2.INTER_LINEAR
+
+scaled_img = cv2.resize(imgRGB, None, fx=1.5, fy=1.5, interpolation=cv2.INTER_LINEAR)
+plt.imshow(scaled_img)
+**Activity 2: Image Denoising (Milestone 2)**
+
+Define a function to add Gaussian noise to an image.
+
+import numpy as np
+
+def add_gaussian_noise(image):
+row, col, ch = image.shape
+mean = 0
+sigma = 0.1
+
+gauss = np.random.normal(mean, sigma, (row, col, ch))
+gauss = gauss.reshape(row, col, ch)  
+noisy = image + gauss * 255
+
+return np.clip(noisy, 0, 255).astype(np.uint8)
+Load the original image "flower.jpg" using OpenCV.
+# importing the required libraries
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+Convert the BGR image to RGB format.
+# Convert BGR to RGB color space
+imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+# show image
+plt.imshow(imgRGB)
+Add Gaussian noise to the image.
+
+Apply Gaussian blur, median filtering, and bilateral filtering for noise reduction.
+
+Display the original noisy image and the denoised images.
+
+
+import cv2
+import numpy as np
+from matplotlib import pyplot as plt
+
+def add_gaussian_noise(image):
+
+  row, col, ch = image.shape
+  mean = 0
+  sigma = 0.1
+  gauss = np.random.normal(mean, sigma, (row, col, ch))
+  gauss = gauss.reshape(row, col, ch)
+  noisy = image + gauss * 255
+  return np.clip(noisy, 0, 255).astype(np.uint8)
+
+# Add Gaussian noise to the image
+noisy_image = add_gaussian_noise(imgRGB)
+# Apply noise reduction techniques
+gaussian_blur = cv2.GaussianBlur(noisy_image, (5, 5), 0)
+median_filtered = cv2.medianBlur(noisy_image, 5)
+bilateral_filtered = cv2.bilateralFilter(noisy_image, 9, 75, 75)
+# Display the images
+plt.figure(figsize=(15, 10))
+plt.subplot(221), plt.imshow(noisy_image), plt.title('Noisy Image')
+plt.subplot(222), plt.imshow(gaussian_blur), plt.title('Gaussian Blur')
+plt.subplot(223), plt.imshow(median_filtered), plt.title('Median Filtering')
+plt.subplot(224), plt.imshow(bilateral_filtered), plt.title('Bilateral Filtering')
+plt.show()
+**Activity 3: Template Matching (Milestone 3)**
+#import required libraries
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+
+
+Load the original image "waldo.jpg"  and the original image "WaldoBeach.jpg" using OpenCV.
+
+Convert both images to grayscale.
+
+Perform template matching to find Waldo's location in the original image.
+
+Draw a rectangle around the matched area.
+
+Display the matching template and the original image with the matched area.
+
+# Loading original template image
+original_image_template = cv2.imread('/content/waldo.jpg')
+
+# Getting Dimensions to draw box similar to template
+height, width = original_image_template.shape[:2]
+
+original_image = cv2.imread('/content/WaldoBeach.jpg')
+
+# Converting to grayscale
+gray_template = cv2.cvtColor(original_image_template, cv2.COLOR_BGR2GRAY)
+gray_original = cv2.cvtColor(original_image, cv2.COLOR_BGR2GRAY)
+
+# Matching template with original image
+match = cv2.matchTemplate(gray_original, gray_template, cv2.TM_CCOEFF)
+min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(match)
+
+# drawing rectangle around the matched area
+top_left = max_loc
+bottom_right = (top_left[0]+height, top_left[1]+width)
+cv2.rectangle(original_image, top_left, bottom_right, (0,0,255), 5)
+
+# Convert BGR to RGB for displaying in matplotlib
+original_image_rgb = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
+original_image_template_rgb = cv2.cvtColor(original_image_template, cv2.COLOR_BGR2RGB)
+
+# Display using Matplotlib
+plt.figure(figsize=(10, 10))
+
+plt.subplot(1, 3, 1)
+plt.imshow(original_image_template_rgb)
+plt.title('Matching Template')
+
+plt.subplot(1, 3, 2)
+plt.imshow(original_image_rgb)
+plt.title('Original Image with Matched Area')
+
+plt.show()
+**Activity 4: Face and Eye Detection (Milestone 4)**
+
+#import required libraries
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+%matplotlib inline
+
+#load the classifiers downloaded from the Github repo
+face_cascade = cv2.CascadeClassifier('/content/haarcascade_frontalface_default.xml')
+eye_cascade = cv2.CascadeClassifier('/content/haarcascade_eye.xml')
+
+#read the image and convert to grayscale format
+img = cv2.imread('/content/people2.jpg')
+inputImg = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+
+#calculate coordinates of the bounding boxes for face
+faces = face_cascade.detectMultiScale(gray)
+for (x,y,w,h) in faces:
+    cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
+    # to ensure that the classifier detects eyes within the face and not outside it.
+    roi_gray = gray[y:y+h, x:x+w]
+    roi_color = img[y:y+h, x:x+w]
+    eyes = eye_cascade.detectMultiScale(roi_gray)
+
+    #draw bounding boxes around detected features
+    for (ex,ey,ew,eh) in eyes:
+        cv2.rectangle(roi_color,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)
+
+# plot the input and output image
+f, axarr = plt.subplots(1,2)
+axarr[0].imshow(inputImg)
+axarr[1].imshow(img)
+
+#write image
+cv2.imwrite('face_detection.jpg',img)
